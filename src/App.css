@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.searchInput {
+  display: inline-block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  outline: none;
+  transition: width .5s;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  border: solid 1px;
+}
+
