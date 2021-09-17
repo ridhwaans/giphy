@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState, useContext} from 'react';
 import {getTrending, getSearchResults} from './api'
-import {Search} from './Search'
+import Modal from './Modal.js';
 import logo from './logo.svg';
 import './App.css';
 
@@ -9,25 +9,13 @@ function App() {
   const inputRef = useRef(null)
   const [searchInput, updateSearchInput] = useState(null)
   const [searchResults, setSearchResults] = useState(null)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedGif, setSelectedGif] = useState(false)
 
   const fetchTrendingGifs = async() => {
     let trendingGifs = await getTrending()
 
     return {trendingGifs}
-  }
-
-  const fetchSearchResults = async() => {
-    let searchResults = await getSearchResults()
-
-    return {searchResults}
-  }
-
-  const changeResults = (item) => {
-    // TODO add debounce
-    fetchSearchResults(item).then(response => {
-      updateSearchInput(response.data)
-    })
-    
   }
 
   useEffect(() => {
@@ -40,29 +28,60 @@ function App() {
     }
   }, [])
 
-  trendingGifs && console.log(`data is ${trendingGifs.data}`)
-  searchInput && console.log(`searchInput is ${searchInput}`)
+  const fetchSearchResults = async(text) => {
+    let searchResults = await getSearchResults(text)
+
+    return {searchResults}
+  }
+
+  useEffect(() => {
+    // TODO add debounce
+    console.log(`text is ${searchInput}`)
+    fetchSearchResults(searchInput).then(response => {
+      setSearchResults(response.searchResults)
+    })
+    
+  }, [searchInput])
+
+  const showModal = () => {
+    setModalVisible(true)
+  };
+
+  const hideModal = () => {
+    setModalVisible(false)
+  };
+
   return (
     <div className="App">
       <div className="searchBox">
         <input className="searchInput"
           ref={inputRef}
           value={searchInput}
-          onChange={(e) => changeResults(e.currentTarget.value)}
+          onChange={(e) => updateSearchInput(e.currentTarget.value)}
           type="text" placeholder="Search for GIFs by name"
         />
       </div>
-      {searchInput && searchInput.trim() ? 
-        searchResults && searchResults.data && searchResults.data.map(item => {
-          return <img src={item.images.fixed_height.url} />
-        })
-      : 
-      trendingGifs && trendingGifs.data && 
-        trendingGifs.data.map(gif => { 
-          return <img src={gif.images.fixed_height.url} />
-        }) 
-      }
-      
+      <div className="gridContainer">
+        {searchInput && searchInput.trim() ? 
+          searchResults && searchResults.data && searchResults.data.map(item => {
+            return <div className="gridElement" onClick={showModal}>
+              <img src={item.images.fixed_height.url} />
+            </div>
+          })
+        : 
+        trendingGifs && trendingGifs.data && 
+          trendingGifs.data.map(gif => { 
+            return <div className="gridElement" onClick={showModal}>
+              <img src={gif.images.fixed_height.url} />
+            </div>
+          }) 
+        }
+      </div>
+
+      <Modal show={modalVisible} handleClose={hideModal}>
+        <p>Modal</p>
+      </Modal>
+
     </div>
   );
 }
