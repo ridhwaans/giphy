@@ -10,7 +10,7 @@ function App() {
   const [searchInput, updateSearchInput] = useState(null)
   const [searchResults, setSearchResults] = useState(null)
   const [modalVisible, setModalVisible] = useState(false)
-  const [selectedGif, setSelectedGif] = useState(false)
+  const [selectedGif, setSelectedGif] = useState(null)
 
   const fetchTrendingGifs = async() => {
     let trendingGifs = await getTrending()
@@ -64,14 +64,14 @@ function App() {
       <div className="gridContainer">
         {searchInput && searchInput.trim() ? 
           searchResults && searchResults.data && searchResults.data.map(item => {
-            return <div className="gridElement" onClick={showModal}>
+            return <div className="gridElement" onClick={()=> {showModal(); setSelectedGif(item);}}>
               <img src={item.images.fixed_height.url} />
             </div>
           })
         : 
         trendingGifs && trendingGifs.data && 
           trendingGifs.data.map(gif => { 
-            return <div className="gridElement" onClick={showModal}>
+            return <div className="gridElement" onClick={()=> {showModal(); setSelectedGif(gif);}}>
               <img src={gif.images.fixed_height.url} />
             </div>
           }) 
@@ -79,7 +79,18 @@ function App() {
       </div>
 
       <Modal show={modalVisible} handleClose={hideModal}>
-        <p>Modal</p>
+        { selectedGif &&  (<React.Fragment>
+          <img src={selectedGif.images.original.url} />          
+          {selectedGif.user && (<React.Fragment>
+            <p>{`User: ${selectedGif.user.display_name}`}</p>
+          <a href={selectedGif.user.profile_url}><img src={selectedGif.user.avatar_url} title={selectedGif.user.username} width="50"/></a>
+          </React.Fragment>)
+          }
+          <p>{selectedGif.title}</p>
+          <p><a href={selectedGif.url}>{selectedGif.url}</a></p>
+          <p>{`Rating: ${selectedGif.rating}`}</p>
+        </React.Fragment>)
+        }
       </Modal>
 
     </div>

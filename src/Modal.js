@@ -1,6 +1,6 @@
 import './App.css';
 
-// https://reactjs.org/docs/composition-vs-inheritance.html
+//https://reactjs.org/docs/composition-vs-inheritance.html
 const Modal = ({ handleClose, show, children }) => {
   const showHideClassName = show ? "modalContainer displayBlock" : "modalContainer displayNone";
   
